@@ -17,7 +17,7 @@ int display_pixel_size;
 boolean b_TEST = false;
 boolean test_hidden_count = false;
 
-boolean test_to_99_percent = true;
+boolean test_to_99_percent = false;
 
 boolean loadSavedNetwork = false;
 

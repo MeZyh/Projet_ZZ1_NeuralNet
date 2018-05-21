@@ -6,6 +6,11 @@ static final int RECTANGLE = 1;
 static final int CIRCLE = 2;
 static final int TRIANGLE = 3;
 
+final int rect_noise = 7;
+final int circ_noise = 7;
+final int tri_noise = 7;
+
+
 class TrainingExemple{
   
    int m_output;
@@ -15,7 +20,7 @@ class TrainingExemple{
    int m_img_size;
   
    TrainingExemple(int img_size, int shape){
-     m_img_size = img_size;
+   m_img_size = img_size;
      
      switch(shape){
         case DEFAULT:
@@ -25,32 +30,37 @@ class TrainingExemple{
           this.generateRandom();
           break;
         case RECTANGLE:
-          this.generateRectangle();
+          this.generateRectangle(rect_noise);
           break;
         case CIRCLE:
-          this.generateCircle();
+          this.generateCircle(circ_noise);
           break;
         case TRIANGLE:
-          this.generateTriangle();
+          this.generateTriangle(tri_noise);
           break;  
      }
    };
    
+   
+   
    public void generate(){
-     int r = int(random(100));
-     if (r < 25){
-        this.generateRectangle();
+     int r = int(random(3));
+     if (r == 0){
+        this.generateRectangle(rect_noise);
      }
-     else if(r < 50){
-       this.generateCircle();
+     else if(r == 1){
+       this.generateCircle(circ_noise);
      }
-     else if(r < 75){
-       this.generateTriangle();
+     else if(r == 2){
+       this.generateTriangle(tri_noise);
      }
-     else{
-        this.generateRandom();
+     else if(r == 3){
+       this.generateRandom();
      }
    }
+   
+   
+   
    
    public void generateRandom(){
       m_output = RANDOM;
@@ -77,7 +87,11 @@ class TrainingExemple{
       }
    }
    
-   public void generateRectangle(){
+   
+   
+   
+   
+   public void generateRectangle(int noise_percent){
       m_output = RECTANGLE;
       
       m_outputs = new float[SHAPE_COUNT];
@@ -100,8 +114,9 @@ class TrainingExemple{
       buffer_img.rect(xoffset,yoffset,size,size);
       buffer_img.endDraw();
       
-      int white = color(255,255,255);
+      addNoise(buffer_img, m_img_size, m_img_size, noise_percent);
       
+      int white = color(255,255,255); 
       for(int i =0; i < m_img_size*m_img_size; i++){
         m_inputs[i] = buffer_img.pixels[i] == white ? 0 : 1;
       }
@@ -109,7 +124,11 @@ class TrainingExemple{
    }
    
    
-   public void generateCircle(){
+   
+   
+   
+   
+   public void generateCircle(int noise_percent){
        m_output = CIRCLE;
        
        m_outputs = new float[SHAPE_COUNT];
@@ -133,14 +152,18 @@ class TrainingExemple{
         buffer_img.ellipse(xoffset, yoffset, diameter, diameter);
         buffer_img.endDraw();
         
-        int white = color(255,255,255);
+        addNoise(buffer_img, m_img_size, m_img_size, noise_percent);
         
+        int white = color(255,255,255);
         for(int i =0; i < m_img_size*m_img_size; i++){
             m_inputs[i] = buffer_img.pixels[i] == white ? 0 : 1;
         }
    }
    
-   public void generateTriangle(){
+   
+   
+   
+   public void generateTriangle(int noise_percent){
        m_output = TRIANGLE;
        
        m_outputs = new float[SHAPE_COUNT];
@@ -166,13 +189,25 @@ class TrainingExemple{
         buffer_img.triangle(x1, y1, x2, y2, x3, y3);
         buffer_img.endDraw();
         
-        int white = color(255,255,255);
+        addNoise(buffer_img, m_img_size, m_img_size, noise_percent);
         
+        int white = color(255,255,255);  
         for(int i =0; i < m_img_size*m_img_size; i++){
             m_inputs[i] = buffer_img.pixels[i] == white ? 0 : 1;
         }
      
    }
    
-   
+}
+
+
+void addNoise(PGraphics image, int image_width, int image_height, int noise_percent)
+{
+  int black = color(0,0,0);
+  
+  for(int i =0; i < image_width*image_height; i++){
+    int r = int(random(100));
+    if (r <= noise_percent && noise_percent != 0)
+      image.pixels[i] = black;
+  }
 }
